@@ -27,6 +27,7 @@ def analyze():
 
 
 @app.route('/api/recommend/<int:product_id>', methods=['GET'])
+@cache.cached(timeout=0)  # Vô hiệu hóa cache
 def recommend(product_id):
     """Endpoint gợi ý sản phẩm dựa trên product_id."""
     try:
