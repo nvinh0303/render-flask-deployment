@@ -4,11 +4,17 @@ from flask_models.data_collection import fetch_data_from_db, fetch_product_info
 
 def build_recommendation_model(df):
     """Tạo mô hình KNN từ dữ liệu."""
+    
+    df = df.groupby(['user_id', 'product_id'], as_index=False)['rating'].mean()  # Tính trung bình rating nếu trùng lặp
+
+    # Tạo ma trận người dùng - sản phẩm
     user_item_matrix = df.pivot(index='user_id', columns='product_id', values='rating').fillna(0)
+    
+    # Xây dựng mô hình NearestNeighbors
     model_knn = NearestNeighbors(metric='cosine', algorithm='brute')
     model_knn.fit(user_item_matrix.values)
+    
     return model_knn, user_item_matrix
-
 
 def get_recommendations(product_id, model, user_item_matrix, n_recommendations=5):
     """
@@ -31,7 +37,7 @@ def get_recommendations(product_id, model, user_item_matrix, n_recommendations=5
     for idx in indices[0][1:]:
         # Tạo đối tượng sản phẩm từ chỉ mục
         recommended_product = {
-            "product_id": user_item_matrix.index[idx],
+            "product_id": user_item_matrix.columns[idx],  # Lấy product_id từ cột
             "similarity_score": 1 / (1 + distances[0][idx-1])  # Độ tương đồng (nghịch đảo của khoảng cách)
         }
         recommendations.append(recommended_product)
