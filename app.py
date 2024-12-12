@@ -1,6 +1,3 @@
-git commit -m "#FITVAA Thêm chức năng xử lý thanh toán"
-
-
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_models.data_collection import fetch_data_from_db, fetch_product_info, fetch_trend_data
